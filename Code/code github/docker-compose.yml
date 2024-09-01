@@ -1,0 +1,13 @@
+services:
+  flaskapp:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+        # En mode développement, le mode debug est automatiquement activé.
+        # Le serveur se relancera lui-même à chaque modification du code, et page de débogage détaillée si une erreur se produit.
+        # à changer la valeur pour 'production' à la fin du projet pour désactiver le rechargement automatique et les pages de débogage
+      - FLASK_ENV=development
+    command: flask run --host=0.0.0.0 --port=8080

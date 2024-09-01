@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sélectionner un modèle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="background.png") }}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Prédiction globale : {{ global_class }}</h1>
+        <form action="/predict" method="post">
+            <label for="model">Sélectionner un modèle binaire :</label>
+            <select name="model" id="model">
+                <option value="binary_model_1">Pas de démence vs Démence très légère</option>
+                <option value="binary_model_2">Démence très légère vs Démence légère</option>
+                <option value="binary_model_3">Démence légère vs Démence modérée</option>
+            </select>
+            <button type="submit">Prédire</button>
+        </form>
+    </div>
+</body>
+</html>

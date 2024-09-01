@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charger une image</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="background.png") }}');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        .performance-section {
+            margin-top: 30px;
+        }
+        .performance-section h2 {
+            text-align: center;
+            color: #333;
+        }
+        .performance-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .performance-section li {
+            background-color: #f8f9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .model-performance {
+            text-align: center;
+        }
+        .model-performance img {
+            max-width: 100%; /* S'assure que l'image ne dépasse pas la largeur du conteneur */
+            height: auto; /* Maintient le ratio de l'image */
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: block;
+        }
+        .metrics {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+        .welcome-section p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .welcome-section p.title {
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .welcome-section p.subtitle {
+            font-style: italic;
+            margin-top: 10px;
+        }
+        .header-image {
+            width: 80%;
+            margin: 20px auto;
+            display: block;
+        }
+        .expected-image {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .expected-image img {
+            max-width: 50%; /* Ajustez cette valeur selon vos besoins */
+            height: auto; /* Maintient le ratio de l'image */
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='Mimir.png') }}" alt="Mimir" class="header-image">
+        <h1>Charger une image</h1>
+
+        <!-- Section pour les messages flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-danger" role="alert">
+            {% for category, message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form id="uploadForm" action="/" method="post" enctype="multipart/form-data">
+            <!-- le paramètre 'accept' permet de limiter les formats acceptés -->
+            <input type="file" name="file" accept="image/*">
+            <button type="submit" class="btn btn-primary">Charger</button>
+        </form>
+
+        <!-- Exemple d'image -->
+        <div class="expected-image">
+            <p>Voici le type d'image attendu pour le modèle : (format jpeg ou jpg ou png)</p>
+            <img src="{{ url_for('static', filename='Exemple.jpg') }}" alt="Exemple d'image attendu">
+        </div>
+
+        <!-- Barre de progression -->
+        <div class="progress mt-3" style="height: 30px; display: none;" id="progressBarContainer">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" id="progressBar"></div>
+        </div>
+
+        <div class="performance-section">
+            <h2>Performances des Modèles</h2>
+            <ul>
+                <li>
+                    <h3>Bienvenue dans Mimir !</h3>
+                    <div class="welcome-section">
+                        <p class="title">Comment utiliser l'application Mimir ?</p>
+                        <p>Notre application permet de détecter les différents stades de la maladie d'Alzheimer, allant d'un statut "Pas de démence" à une "Démence modérée".</p>
+                        <p class="subtitle">Le stade "Pas de démence" :</p>
+                        <p>Le patient n'est pas atteint par la maladie d'Alzheimer.</p>
+                        <p class="subtitle">Le stade "Démence très légère" :</p>
+                        <p>Le patient ne présente pas de signe apparent de la maladie d'Alzheimer et réussit les tests, mais l'IRM présente des signes de la maladie d'Alzheimer.</p>
+                        <p class="subtitle">Le stade "Démence légère" :</p>
+                        <p>Le patient ne réussit pas tous les tests et commence à présenter des symptômes de la maladie. Une perte d'autonomie est observable dans la vie quotidienne.</p>
+                        <p class="subtitle">Le stade "Démence modérée" :</p>
+                        <p>Le stade de la maladie est avancé et le patient n'est plus autonome, il a désormais besoin d'être pris en charge dans sa vie quotidienne.</p>
+                        <p class="subtitle">Comment utiliser l'application ?</p>
+                        <p>Charger une IRM d'un patient et appuyer sur le bouton "Charger", ce qui permettra à nos modèles d'intelligence artificielle d'identifier le stade de la maladie parmi ceux cités ci-dessus.</p>
+                    </div>
+                </li>
+                <li>
+                    <h3>Modèle Global</h3>
+                    <div class="model-performance">
+                        <p>Comment lire ?</p>
+                        <p>Précision (99%) : Indique la proportion des prédictions correctes parmi toutes les prédictions faites par le modèle. Une précision de 99% signifie que 99% des prédictions du modèle sont correctes.</p>
+                        <p>Rappel (100%) : Mesure la capacité du modèle à identifier toutes les instances positives. Un rappel de 100% signifie que le modèle a correctement identifié toutes les instances positives dans les données.</p>
+                        <p>F1-score (99%) : La moyenne harmonique de la précision et du rappel. Un F1-score de 99% indique un bon équilibre entre précision et rappel, signifiant que le modèle est à la fois précis et complet dans ses prédictions.</p>
+                        <p>Matrice de Confusion</p>
+                        <p>La matrice de confusion présente les résultats de classification sous forme de tableau, où :</p>
+                        <ul>
+                            <li>Les lignes représentent les classes réelles (vérités terrain).</li>
+                            <li>Les colonnes représentent les classes prédites par le modèle.</li>
+                        </ul>
+                        <div class="metrics">
+                            <p>Précision : 99%</p>
+                            <p>Rappel : 100%</p>
+                            <p>F1-score : 99%</p>
+                        </div>
+                        <img src="{{ url_for('static', filename='confusion_matrix_global.png') }}" alt="Matrice de confusion du modèle global">
+                    </div>
+                </li>
+                <li>
+                    <h3>Modèle 1: Pas de démence vs Démence très légère</h3>
+                    <div class="model-performance">
+                        <div class="metrics">
+                            <p>Précision : 99%</p>
+                            <p>Rappel : 99%</p>
+                            <p>F1-score : 99%</p>
+                        </div>
+                        <img src="{{ url_for('static', filename='confusion_matrix_model1.png') }}" alt="Matrice de confusion du modèle 1">
+                    </div>
+                </li>
+                <li>
+                    <h3>Modèle 2: Démence très légère vs Démence légère</h3>
+                    <div class="model-performance">
+                        <div class="metrics">
+                            <p>Précision : 100%</p>
+                            <p>Rappel : 100%</p>
+                            <p>F1-score : 100%</p>
+                        </div>
+                        <img src="{{ url_for('static', filename='confusion_matrix_model2.png') }}" alt="Matrice de confusion du modèle 2">
+                    </div>
+                </li>
+                <li>
+                    <h3>Modèle 3: Démence légère vs Démence modérée</h>
+                    <div class="model-performance">
+                        <div class="metrics">
+                            <p>Précision : 100%</p>
+                            <p>Rappel : 100%</p>
+                            <p>F1-score : 100%</p>
+                        </div>
+                        <img src="{{ url_for('static', filename='confusion_matrix_model3.png') }}" alt="Matrice de confusion du modèle 3">
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            document.getElementById('progressBarContainer').style.display = 'block';
+            var progressBar = document.getElementById('progressBar');
+            var width = 0;
+            var interval = setInterval(function() {
+                if (width >= 100) {
+                    clearInterval(interval);
+                } else {
+                    width++;
+                    progressBar.style.width = width + '%';
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>

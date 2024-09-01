@@ -1,0 +1,24 @@
+# Utiliser une image de base avec Python
+FROM python:3.10-slim
+
+# Installer les dépendances système nécessaires
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0
+
+# Définir le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copier le fichier requirements.txt et installer les dépendances Python
+COPY requirements.txt requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Copier le reste du code de l'application
+COPY . .
+
+# Exposer le port sur lequel l'application va tourner
+EXPOSE 8080
+
+# Définir la commande pour exécuter l'application
+CMD ["python", "app.py"]
